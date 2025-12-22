@@ -80,8 +80,30 @@ public class User extends UserService {
         User user = new User("testId", "testPassword", "Admin", "Ali");
         try {
             user.create(user);
-//            User testUser = user.read("testId");
-//            ArrayList<User> users = user.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        user = new User("customer1", "password1", "Customer", "Ali1");
+        try {
+            user.create(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        user = new User("customer2", "password2", "Customer", "Ali2");
+        try {
+            user.create(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        user = new User("customer3", "password3", "Customer", "Ali3");
+        try {
+            user.create(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        user = new User("banker", "password4", "Banker", "Ali3");
+        try {
+            user.create(user);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

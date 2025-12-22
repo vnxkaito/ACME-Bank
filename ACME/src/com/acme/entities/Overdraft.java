@@ -1,5 +1,5 @@
 package com.acme.entities;
-import com.acme.services.overdraftIddraft.OverdraftService;
+import com.acme.services.overdraft.OverdraftService;
 
 public class Overdraft extends OverdraftService{
     private String overdraftId;

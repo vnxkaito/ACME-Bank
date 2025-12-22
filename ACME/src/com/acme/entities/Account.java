@@ -19,11 +19,56 @@ public class Account extends AccountService {
 
     public static void main(String[] args) throws IOException {
         Account account = new Account();
-        account.setAccountId("testAccount");
-        account.setAccountType("CHECKING");
+        account.setAccountId("c1ch");
+        account.setAccountType("Checking");
         account.setBalance(1000);
-        account.setCardType("MASTERCARD");
-        account.setUserId("testId");
+        account.setCardType("Mastercard Titanium");
+        account.setUserId("customer1");
+
+        account.create(account);
+
+        account = new Account();
+        account.setAccountId("c1sv");
+        account.setAccountType("Saving");
+        account.setBalance(1000);
+        account.setCardType("Mastercard Titanium");
+        account.setUserId("customer1");
+
+        account.create(account);
+
+        account = new Account();
+        account.setAccountId("c2ch");
+        account.setAccountType("Checking");
+        account.setBalance(1000);
+        account.setCardType("Mastercard Platinum");
+        account.setUserId("customer2");
+
+        account.create(account);
+
+        account = new Account();
+        account.setAccountId("c2sv");
+        account.setAccountType("Saving");
+        account.setBalance(1000);
+        account.setCardType("Mastercard Platinum");
+        account.setUserId("customer2");
+
+        account.create(account);
+
+        account = new Account();
+        account.setAccountId("c3ch");
+        account.setAccountType("Checking");
+        account.setBalance(1000);
+        account.setCardType("Mastercard");
+        account.setUserId("customer3");
+
+        account.create(account);
+
+        account = new Account();
+        account.setAccountId("c3sv");
+        account.setAccountType("Saving");
+        account.setBalance(1000);
+        account.setCardType("Mastercard");
+        account.setUserId("customer3");
 
         account.create(account);
     }
@@ -85,15 +130,21 @@ public class Account extends AccountService {
 
     public boolean withdraw(double amount){
         this.balance -= amount;
+        Transaction transaction = new Transaction();
+        transaction.logWithdraw(this, amount);
         return true;
     }
 
     public boolean deposit(double amount){
         this.balance += amount;
+        Transaction transaction = new Transaction();
+        transaction.logDeposit(this, amount);
         return true;
     }
 
     public boolean transfer(double amount, Account toAccount){
+        Transaction transaction = new Transaction();
+        transaction.logTransfer(this, toAccount, amount);
         return this.transferSend(amount, toAccount) && toAccount.transferReceive(amount, this);
     }
 
