@@ -4,6 +4,7 @@ import com.acme.services.account.AccountService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Account extends AccountService {
     private String accountId;
@@ -122,16 +123,27 @@ public class Account extends AccountService {
     }
 
 
-    public static ArrayList<Account> getAccountsOfUser(String userId){
-        ArrayList<Account> accounts = new ArrayList<>();
-
+    public static List<Account> getAccountsOfUser(String userId) throws IOException {
+        Account account = new Account();
+        List<Account> accounts = new ArrayList<>();
+        accounts = account.readAll().stream().filter(a -> a.userId.equalsIgnoreCase(userId)).toList();
         return accounts;
     }
 
-    public boolean withdraw(double amount){
-        this.balance -= amount;
-        Transaction transaction = new Transaction();
-        transaction.logWithdraw(this, amount);
+    public boolean withdraw(double amount) throws IOException {
+        Overdraft overdraft = new Overdraft();
+        if(this.balance > -100 && !this.isLocked){
+            if(this.balance < 0) {
+                overdraft.chargeOverdraft(this.accountId, 35);
+            }
+                this.balance -= amount;
+                Transaction transaction = new Transaction();
+                transaction.logWithdraw(this, amount);
+                this.update(this);
+            }else {
+            return false;
+        }
+
         return true;
     }
 
@@ -139,6 +151,7 @@ public class Account extends AccountService {
         this.balance += amount;
         Transaction transaction = new Transaction();
         transaction.logDeposit(this, amount);
+        this.update(this);
         return true;
     }
 

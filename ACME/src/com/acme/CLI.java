@@ -5,6 +5,7 @@ import com.acme.entities.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class CLI {
@@ -150,8 +151,9 @@ public class CLI {
         showMainMenu();
     }
 
-    public void viewOwnAccounts(){
+    public void viewOwnAccounts() throws IOException {
         Account.getAccountsOfUser(session.loggedUser.getUserId()).forEach(System.out::println);
+        showMainMenu();
     }
 
     public void withdraw() throws IOException {
@@ -247,14 +249,14 @@ public class CLI {
         showMainMenu();
     }
 
-    public String chooseAccount(){
-        ArrayList<Account> accounts = new ArrayList<>();
+    public String chooseAccount() throws IOException {
+        List<Account> accounts = new ArrayList<>();
         if(session.loggedUser.getUserId() != null){
             accounts = Account.getAccountsOfUser(session.loggedUser.getUserId());
             if(!accounts.isEmpty()){
                 System.out.println("Please choose an account from below by entering its number:");
-                for(int i = 1; i < accounts.size(); i++){
-                    System.out.println(i + ") " + accounts.get(i).getAccountId());
+                for(int i = 1; i <= accounts.size(); i++){
+                    System.out.println(i + ") " + accounts.get(i-1).getAccountId());
                 }
                 int input = scn.nextInt();
                 return accounts.get(input).getAccountId();

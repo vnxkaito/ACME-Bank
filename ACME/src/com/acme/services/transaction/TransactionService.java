@@ -5,11 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TransactionService implements TransactionServiceInterface{
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
+            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     @Override
     public boolean create(Transaction transaction) throws IOException {
         transaction.setTransactionId(Transaction.generateId());
@@ -66,4 +71,5 @@ public class TransactionService implements TransactionServiceInterface{
         }
         return true;
     }
+
 }

@@ -12,7 +12,7 @@ public class OverdraftService implements OverdraftServiceInterface {
     ObjectMapper mapper = new ObjectMapper();
     @Override
     public boolean create(Overdraft overdraft) throws IOException {
-        String json = mapper.writeValueAsString(overdraft);
+        overdraft.setOverdraftId(overdraft.genOverdraftId());
         mapper.writeValue(new File("data/overdrafts/"+overdraft.getOverdraftId()+".json"), overdraft);
         return true;
     }
