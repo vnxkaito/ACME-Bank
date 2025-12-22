@@ -127,6 +127,16 @@ public class CLI {
         System.out.println("0) exit");
         int input = scn.nextInt();
         switch(input){
+            case 1:
+                viewOwnAccounts();
+            case 2:
+                withdraw();
+            case 3:
+                deposit();
+            case 4:
+                transfer();
+            case 5:
+                changePassword();
             case 9:
                 logout();
             case 0:
@@ -140,11 +150,16 @@ public class CLI {
         showMainMenu();
     }
 
+    public void viewOwnAccounts(){
+        Account.getAccountsOfUser(session.loggedUser.getUserId()).forEach(System.out::println);
+    }
+
     public void withdraw() throws IOException {
         String accountId = chooseAccount();
         Account account = new Account();
         account = account.read(accountId);
-        double amount = 0;
+        System.out.println("Enter the amount:");
+        double amount = scn.nextDouble();
         if(account.withdraw(amount)){
             System.out.println("done");
         }else{
@@ -157,7 +172,8 @@ public class CLI {
         String accountId = chooseAccount();
         Account account = new Account();
         account = account.read(accountId);
-        double amount = 0;
+        System.out.println("Enter the amount:");
+        double amount = scn.nextDouble();
         if(account.deposit(amount)){
             System.out.println("done");
         }else{
@@ -172,7 +188,8 @@ public class CLI {
         Account account = new Account();
         account = account.read(accountId);
         Account toAccount = new Account();
-        double amount = 0;
+        System.out.println("Enter the amount:");
+        double amount = scn.nextDouble();
         if(account.transfer(amount, toAccount)){
             System.out.println("done");
         }else{
@@ -183,7 +200,12 @@ public class CLI {
 
 
     public void changePassword() throws IOException {
-
+        System.out.println("Enter your new password");
+        String newPassword = scn.next();
+        User user = new User();
+        user = user.read(session.loggedUser.getUserId());
+        user.setPassword(newPassword);
+        user.update(user);
         showMainMenu();
     }
 

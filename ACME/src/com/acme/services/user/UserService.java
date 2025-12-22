@@ -17,12 +17,13 @@ import java.util.List;
 
 public class UserService implements UserServiceInterface {
     ObjectMapper mapper = new ObjectMapper();
+
     @Override
     public boolean create(User user) throws IOException {
         String json = mapper.writeValueAsString(user);
         PasswordEncryption enc = new PasswordEncryption();
         user.setPassword(enc.encryptPassword(user.getPassword()));
-        mapper.writeValue(new File("data/users/"+user.getFileName()+".json"), user);
+        mapper.writeValue(new File("data/users/" + user.getFileName() + ".json"), user);
         return true;
     }
 
@@ -30,9 +31,9 @@ public class UserService implements UserServiceInterface {
     public User read(String userId) throws IOException {
         List<User> userList = new ArrayList<>();
         User user = new User();
-        try{
+        try {
             userList = readAll().stream().filter(u -> u.getUserId().equalsIgnoreCase(userId)).toList();
-            if(!userList.isEmpty()){
+            if (!userList.isEmpty()) {
                 user = userList.get(0);
             }
         } catch (IOException e) {
@@ -47,9 +48,9 @@ public class UserService implements UserServiceInterface {
 
         File dir = new File("data/users");
         File[] files = dir.listFiles((d, name) -> name.endsWith(".json"));
-        if(files != null){
-            for(File file: files){
-                String url = "data/users/"+file.getName();
+        if (files != null) {
+            for (File file : files) {
+                String url = "data/users/" + file.getName();
                 User user = mapper.readValue(new File(url), User.class);
                 users.add(user);
             }
@@ -63,7 +64,15 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public boolean update(User user) {
-        return false;
+    public boolean update(User user) throws IOException {
+        File file = new File("data/users/" + user.getFileName() + ".json");
+        if (!file.exists()) {
+            return false;
+        }
+        PasswordEncryption enc = new PasswordEncryption();
+        user.setPassword(enc.encryptPassword(user.getPassword()));
+        mapper.writeValue(new File("data/users/" + user.getFileName() + ".json"), user);
+        return true;
+
     }
 }

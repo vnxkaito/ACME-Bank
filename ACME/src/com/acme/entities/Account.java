@@ -158,5 +158,15 @@ public class Account extends AccountService {
         return update(this);
     }
 
-
+    @Override
+    public String toString() {
+        return "Account{" +
+                "accountId='" + accountId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", balance=" + balance +
+                ", accountType='" + accountType + '\'' +
+                ", cardType='" + cardType + '\'' +
+                ", isLocked=" + isLocked +
+                '}';
+    }
 }

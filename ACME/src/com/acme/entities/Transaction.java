@@ -129,5 +129,17 @@ public class Transaction extends TransactionService {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", timestamp=" + timestamp +
+                ", fromAccountId='" + fromAccountId + '\'' +
+                ", toAccountId='" + toAccountId + '\'' +
+                ", amount=" + amount +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
 
 }
