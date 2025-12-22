@@ -1,13 +1,16 @@
 package com.acme.entities;
 
+import com.acme.services.transaction.TransactionService;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public class Transaction {
+public class Transaction extends TransactionService {
     private String transactionId;
     private Optional<LocalDateTime> timestamp;
-    private Account fromAccount = new Account();
-    private Account toAccount = new Account();
+    private String fromAccountId = "";
+    private String toAccountId = "";
     private double amount;
     private String type;
 
@@ -27,20 +30,20 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public Account getFromAccount() {
-        return fromAccount;
+    public String getFromAccountId() {
+        return fromAccountId;
     }
 
-    public void setFromAccount(Account fromAccount) {
-        this.fromAccount = fromAccount;
+    public void setFromAccountId(String fromAccountId) {
+        this.fromAccountId = fromAccountId;
     }
 
-    public Account getToAccount() {
-        return toAccount;
+    public String getToAccountId() {
+        return toAccountId;
     }
 
-    public void setToAccount(Account toAccount) {
-        this.toAccount = toAccount;
+    public void setToAccountId(String toAccountId) {
+        this.toAccountId = toAccountId;
     }
 
     public double getAmount() {
@@ -62,4 +65,69 @@ public class Transaction {
     public Transaction(){
 
     }
+
+    public static String generateId(){
+        Transaction transaction = new Transaction();
+        boolean isValid = false;
+        int random;
+        do{
+            random = java.util.concurrent.ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
+            try{
+                transaction = transaction.read(("T"+random));
+                if(transaction.getTransactionId() == null){
+                    isValid = true;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }while(!isValid);
+        return "T"+random;
+    }
+
+    public void logWithdraw(Account fromAccount, double amount){
+        Transaction transaction = new Transaction();
+        transaction.setTimestamp(Optional.of(LocalDateTime.now()));
+        transaction.setAmount(amount);
+        transaction.setFromAccountId(fromAccount.getAccountId());
+        transaction.setToAccountId("");
+        transaction.setType("withdraw");
+
+        try {
+            transaction.create(transaction);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void logDeposit(Account toAccount, double amount){
+        Transaction transaction = new Transaction();
+        transaction.setTimestamp(Optional.of(LocalDateTime.now()));
+        transaction.setAmount(amount);
+        transaction.setToAccountId(toAccount.getAccountId());
+        transaction.setFromAccountId("");
+        transaction.setType("deposit");
+
+        try {
+            transaction.create(transaction);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void logTransfer(Account fromAccount, Account toAccount, double amount){
+        Transaction transaction = new Transaction();
+        transaction.setTimestamp(Optional.of(LocalDateTime.now()));
+        transaction.setAmount(amount);
+        transaction.setFromAccountId(fromAccount.getAccountId());
+        transaction.setToAccountId(toAccount.getAccountId());
+        transaction.setType("transfer");
+
+        try {
+            transaction.create(transaction);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

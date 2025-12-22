@@ -12,7 +12,7 @@ public class TransactionService implements TransactionServiceInterface{
     ObjectMapper mapper = new ObjectMapper();
     @Override
     public boolean create(Transaction transaction) throws IOException {
-        String json = mapper.writeValueAsString(transaction);
+        transaction.setTransactionId(Transaction.generateId());
         mapper.writeValue(new File("data/transactions/"+transaction.getTransactionId()+".json"), transaction);
         return true;
     }
