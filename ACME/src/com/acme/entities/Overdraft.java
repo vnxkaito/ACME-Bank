@@ -43,6 +43,10 @@ public class Overdraft extends OverdraftService{
         this.isPaid = true;
     }
 
+    public Overdraft(){
+
+    }
+
 
 
 

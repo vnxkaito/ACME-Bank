@@ -1,4 +1,4 @@
-package com.acme.services.overdraftIddraft;
+package com.acme.services.overdraft;
 
 import com.acme.entities.Overdraft;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OverdraftService implements OverdraftServiceInterface{
+public class OverdraftService implements OverdraftServiceInterface {
     ObjectMapper mapper = new ObjectMapper();
     @Override
     public boolean create(Overdraft overdraft) throws IOException {
         String json = mapper.writeValueAsString(overdraft);
-        mapper.writeValue(new File("data/overdrafts/"+overdraft.getoverdraftId()+".json"), overdraft);
+        mapper.writeValue(new File("data/overdrafts/"+overdraft.getOverdraftId()+".json"), overdraft);
         return true;
     }
 
@@ -22,7 +22,7 @@ public class OverdraftService implements OverdraftServiceInterface{
         List<Overdraft> overdraftsList = new ArrayList<>();
         Overdraft overdraft = new Overdraft();
         try{
-            overdraftsList = readAll().stream().filter(u -> u.getoverdraftId().equalsIgnoreCase(overdraftId)).toList();
+            overdraftsList = readAll().stream().filter(u -> u.getOverdraftId().equalsIgnoreCase(overdraftId)).toList();
             if(!overdraftsList.isEmpty()){
                 overdraft = overdraftsList.get(0);
             }
@@ -55,7 +55,7 @@ public class OverdraftService implements OverdraftServiceInterface{
 
     @Override
     public boolean update(Overdraft overdraft) {
-        File file = new File("data/overdrafts/"+overdraft.getoverdraftId()+".json");
+        File file = new File("data/overdrafts/"+overdraft.getOverdraftId()+".json");
         if(!file.exists()){
             return false;
         }
