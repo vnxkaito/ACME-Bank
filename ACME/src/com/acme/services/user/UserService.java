@@ -1,5 +1,6 @@
 package com.acme.services.user;
 
+import com.acme.PasswordEncryption;
 import com.acme.entities.User;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ public class UserService implements UserServiceInterface {
     @Override
     public boolean create(User user) throws IOException {
         String json = mapper.writeValueAsString(user);
+        PasswordEncryption enc = new PasswordEncryption();
+        user.setPassword(enc.encryptPassword(user.getPassword()));
         mapper.writeValue(new File("data/users/"+user.getFileName()+".json"), user);
         return true;
     }
@@ -41,7 +44,9 @@ public class UserService implements UserServiceInterface {
         File[] files = dir.listFiles((d, name) -> name.endsWith(".json"));
         if(files != null){
             for(File file: files){
-                User user = mapper.readValue(file, User.class);
+                String url = "data/users/"+file.getName();
+                System.out.println(url);
+                User user = mapper.readValue(new File(url), User.class);
                 users.add(user);
             }
         }

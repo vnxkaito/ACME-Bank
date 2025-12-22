@@ -2,8 +2,10 @@ package com.acme.entities;
 
 import com.acme.PasswordEncryption;
 import com.acme.services.user.UserService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class User extends UserService {
     private String userId;
@@ -43,15 +45,27 @@ public class User extends UserService {
         this.role = role;
     }
 
+    public User(){};
 
     public User(String userId, String password, String role, String name){
         PasswordEncryption enc = new PasswordEncryption();
         this.userId = userId;
-        this.password = enc.encryptPassword(password);
+        this.password = password;
         this.role = role;
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @JsonIgnore
     public String getFileName(){
         return role + "-" + name + "-" + userId;
     }
@@ -59,7 +73,9 @@ public class User extends UserService {
     public static void main(String[] args){
         User user = new User("testId", "testPassword", "testRole", "Ali");
         try {
-            user.create(user);
+//            user.create(user);
+//            User testUser = user.read("testId");
+            ArrayList<User> users = user.readAll();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
