@@ -1,3 +1,5 @@
+package com.acme;
+
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 public class PasswordEncryption {
