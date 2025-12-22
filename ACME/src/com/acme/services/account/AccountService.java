@@ -56,6 +56,15 @@ public class AccountService implements AccountServiceInterface{
 
     @Override
     public boolean update(Account account) {
-        return false;
+        File file = new File("data/accounts/"+account.getAccountId()+".json");
+        if(!file.exists()){
+            return false;
+        }
+        try{
+            mapper.writeValue(file, account);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 }
