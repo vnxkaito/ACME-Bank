@@ -335,7 +335,7 @@ public class CLI {
                     System.out.println(i + ") " + accounts.get(i-1).getAccountId());
                 }
                 int input = scn.nextInt();
-                return accounts.get(input).getAccountId();
+                return accounts.get(input-1).getAccountId();
             }else{
                 System.out.println("This user has no accounts");
                 return null;
