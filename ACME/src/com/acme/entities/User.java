@@ -55,6 +55,12 @@ public class User extends UserService {
         this.name = name;
     }
 
+    public static boolean doesUserExist(String userId) throws IOException {
+        User user = new User();
+        ArrayList<User> users = user.readAll();
+        return !users.stream().filter(u -> u.getUserId().equalsIgnoreCase(userId)).toList().isEmpty();
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -71,11 +77,11 @@ public class User extends UserService {
     }
 
     public static void main(String[] args){
-        User user = new User("testId", "testPassword", "testRole", "Ali");
+        User user = new User("testId", "testPassword", "Admin", "Ali");
         try {
-//            user.create(user);
+            user.create(user);
 //            User testUser = user.read("testId");
-            ArrayList<User> users = user.readAll();
+//            ArrayList<User> users = user.readAll();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
