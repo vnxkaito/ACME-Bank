@@ -131,6 +131,9 @@ public class Account extends AccountService {
     }
 
     public boolean withdraw(double amount) throws IOException {
+        if(!checkWithdrawLimit()){
+            return false;
+        }
         Overdraft overdraft = new Overdraft();
         if(this.balance > -100 && !this.isLocked){
             if(this.balance < 0) {
@@ -170,6 +173,26 @@ public class Account extends AccountService {
         this.balance += amount;
         return update(this);
     }
+
+    private boolean checkWithdrawLimit() throws IOException {
+        Transaction transaction = new Transaction();
+        double usage = transaction.depositAmountToday(accountId);
+        double limit = 0;
+        if(this.cardType.equalsIgnoreCase("mastercard titanium")){
+            limit = 10000;
+        } else if (this.cardType.equalsIgnoreCase("mastercard Platinum")) {
+            limit = 20000;
+        } else{ // mastercard
+            limit = 5000;
+        }
+        if(usage>limit){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+
 
     @Override
     public String toString() {

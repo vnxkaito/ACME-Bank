@@ -72,4 +72,40 @@ public class TransactionService implements TransactionServiceInterface{
         return true;
     }
 
+    public double depositAmountToday(String accountId) throws IOException {
+        return readAll().stream()
+                .filter(t -> "deposit".equalsIgnoreCase(t.getType()))
+                .filter(t -> t.getTimestamp().isPresent()
+                        && t.getTimestamp().get().getYear()  == java.time.LocalDateTime.now().getYear()
+                        && t.getTimestamp().get().getMonth() == java.time.LocalDateTime.now().getMonth()
+                        && t.getTimestamp().get().getDayOfMonth() == java.time.LocalDateTime.now().getDayOfMonth())
+                .filter(t -> accountId.equals(t.getToAccountId()))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public double withdrawAmountToday(String accountId) throws IOException {
+        return readAll().stream()
+                .filter(t -> "withdraw".equalsIgnoreCase(t.getType()))
+                .filter(t -> t.getTimestamp().isPresent()
+                        && t.getTimestamp().get().getYear()  == java.time.LocalDateTime.now().getYear()
+                        && t.getTimestamp().get().getMonth() == java.time.LocalDateTime.now().getMonth()
+                        && t.getTimestamp().get().getDayOfMonth() == java.time.LocalDateTime.now().getDayOfMonth())
+                .filter(t -> accountId.equals(t.getToAccountId()))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public double transferAmountToday(String accountId) throws IOException {
+        return readAll().stream()
+                .filter(t -> "transfer".equalsIgnoreCase(t.getType()))
+                .filter(t -> t.getTimestamp().isPresent()
+                        && t.getTimestamp().get().getYear()  == java.time.LocalDateTime.now().getYear()
+                        && t.getTimestamp().get().getMonth() == java.time.LocalDateTime.now().getMonth()
+                        && t.getTimestamp().get().getDayOfMonth() == java.time.LocalDateTime.now().getDayOfMonth())
+                .filter(t -> accountId.equals(t.getToAccountId()))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
 }
