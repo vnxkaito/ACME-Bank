@@ -38,8 +38,10 @@ public class CLI {
         switch(input){
             case 1:
                 showLoginMenu();
+                break;
             case 0:
                 System.exit(0);
+                break;
 
         }
 
@@ -92,10 +94,13 @@ public class CLI {
         switch(input){
             case 2:
                 createAccount();
+                break;
             case 9:
                 logout();
+                break;
             case 0:
                 System.exit(0);
+                break;
 
         }
     }
@@ -111,10 +116,13 @@ public class CLI {
         switch(input){
             case 1:
                 createAccount();
+                break;
             case 9:
                 logout();
+                break;
             case 0:
                 System.exit(0);
+                break;
 
         }
     }
@@ -132,20 +140,28 @@ public class CLI {
         switch(input){
             case 1:
                 viewOwnAccounts();
+                break;
             case 2:
                 withdraw();
+                break;
             case 3:
                 deposit();
+                break;
             case 4:
                 transfer();
+                break;
             case 5:
                 changePassword();
+                break;
             case 6:
                 displayAccountStatement();
+                break;
             case 9:
                 logout();
+                break;
             case 0:
                 System.exit(0);
+                break;
 
         }
     }
@@ -240,17 +256,23 @@ public class CLI {
         switch (input){
             case 1:
                 transaction.printTodayTransactions(accountId);
+                break;
             case 2:
                 transaction.printYesterdayTransactions(accountId);
+                break;
             case 3:
                 transaction.printPastDaysStatement(accountId,1);
+                break;
             case 4:
                 transaction.printPastDaysStatement(accountId,7);
+                break;
             case 5:
                 transaction.printPastDaysStatement(accountId,30);
+                break;
             case 6:
                 int[] period = getCustomPeriod();
                 transaction.printCustomPeriodStatement(accountId, period);
+                break;
         }
         showMainMenu();
     }

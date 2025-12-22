@@ -137,7 +137,7 @@ public class Transaction extends TransactionService {
         transactions = transaction.readAll().stream().toList();
         transactions = transactions.stream().filter(t->t.getTimestamp().isPresent())
                 .filter(t->t.getTimestamp().get().isAfter(LocalDateTime.now().minusDays(days)))
-                .filter(t->(t.getToAccountId().equalsIgnoreCase(accountId))||(t.getFromAccountId().equalsIgnoreCase(accountId)))
+                .filter(t->((t.getToAccountId().equalsIgnoreCase(accountId))||(t.getFromAccountId().equalsIgnoreCase(accountId))))
                 .toList();
         return new ArrayList<>(transactions);
     }
