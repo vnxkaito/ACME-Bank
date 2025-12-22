@@ -1,6 +1,7 @@
 package com.acme;
 
 import com.acme.entities.Account;
+import com.acme.entities.Transaction;
 import com.acme.entities.User;
 
 import java.io.IOException;
@@ -124,6 +125,7 @@ public class CLI {
         System.out.println("3) deposit");
         System.out.println("4) transfer");
         System.out.println("5) change password");
+        System.out.println("6) display account statement");
         System.out.println("9) logout");
         System.out.println("0) exit");
         int input = scn.nextInt();
@@ -138,6 +140,8 @@ public class CLI {
                 transfer();
             case 5:
                 changePassword();
+            case 6:
+                displayAccountStatement();
             case 9:
                 logout();
             case 0:
@@ -222,8 +226,58 @@ public class CLI {
     }
 
     public void displayAccountStatement() throws IOException {
-        showMainMenu();
+        Transaction transaction = new Transaction();
+        String accountId = chooseAccount();
+        System.out.println("Would you like to view the statement for:");
+        System.out.println("1) Today");
+        System.out.println("2) Yesterday");
+        System.out.println("3) Last 24 hours");
+        System.out.println("4) Last 7 days");
+        System.out.println("5) Last 30 days");
+        System.out.println("6) custom period");
+        int input = scn.nextInt();
 
+        switch (input){
+            case 1:
+                transaction.printTodayTransactions(accountId);
+            case 2:
+                transaction.printYesterdayTransactions(accountId);
+            case 3:
+                transaction.printPastDaysStatement(accountId,1);
+            case 4:
+                transaction.printPastDaysStatement(accountId,7);
+            case 5:
+                transaction.printPastDaysStatement(accountId,30);
+            case 6:
+                int[] period = getCustomPeriod();
+                transaction.printCustomPeriodStatement(accountId, period);
+        }
+        showMainMenu();
+    }
+
+    public int[] getCustomPeriod(){
+        System.out.println("Enter starting year");
+        int startingYear = scn.nextInt();
+        System.out.println("Enter starting month");
+        int startingMonth = scn.nextInt();
+        System.out.println("Enter starting day");
+        int startingDay = scn.nextInt();
+        System.out.println("Enter ending year");
+        int endingYear = scn.nextInt();
+        System.out.println("Enter ending month");
+        int endingMonth = scn.nextInt();
+        System.out.println("Enter ending day");
+        int endingDay = scn.nextInt();
+
+        int[] output = new int[6];
+        output[0] = startingYear;
+        output[1] = startingMonth;
+        output[2] = startingDay;
+        output[3] = endingYear;
+        output[4] = endingMonth;
+        output[5] = endingDay;
+
+        return output;
     }
 
     public void createAccount() throws IOException {
