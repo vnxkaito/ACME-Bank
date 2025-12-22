@@ -1,6 +1,5 @@
 package com.acme.services.account;
 
-import com.acme.PasswordEncryption;
 import com.acme.entities.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
