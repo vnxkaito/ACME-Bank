@@ -140,32 +140,51 @@ public class CLI {
         showMainMenu();
     }
 
-    public String getOwnAccountDialog() throws IOException {
-        String accountId = "";
-        showMainMenu();
-
-        return accountId;
-    }
-
     public void withdraw() throws IOException {
-
+        String accountId = chooseAccount();
+        Account account = new Account();
+        account = account.read(accountId);
+        double amount = 0;
+        if(account.withdraw(amount)){
+            System.out.println("done");
+        }else{
+            System.out.println("failed");
+        }
         showMainMenu();
     }
 
     public void deposit() throws IOException {
-        showMainMenu();
+        String accountId = chooseAccount();
+        Account account = new Account();
+        account = account.read(accountId);
+        double amount = 0;
+        if(account.deposit(amount)){
+            System.out.println("done");
+        }else{
+            System.out.println("failed");
+        }
 
+        showMainMenu();
     }
 
     public void transfer() throws IOException {
+        String accountId = chooseAccount();
+        Account account = new Account();
+        account = account.read(accountId);
+        Account toAccount = new Account();
+        double amount = 0;
+        if(account.transfer(amount, toAccount)){
+            System.out.println("done");
+        }else{
+            System.out.println("failed");
+        }
         showMainMenu();
-
     }
 
 
     public void changePassword() throws IOException {
-        showMainMenu();
 
+        showMainMenu();
     }
 
     public void linkAccountToUser() throws IOException {

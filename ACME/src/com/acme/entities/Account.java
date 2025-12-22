@@ -82,4 +82,30 @@ public class Account extends AccountService {
 
         return accounts;
     }
+
+    public boolean withdraw(double amount){
+        this.balance -= amount;
+        return true;
+    }
+
+    public boolean deposit(double amount){
+        this.balance += amount;
+        return true;
+    }
+
+    public boolean transfer(double amount, Account toAccount){
+        return this.transferSend(amount, toAccount) && toAccount.transferReceive(amount, this);
+    }
+
+    private boolean transferSend(double amount, Account toAccount){
+        this.balance -= amount;
+        return update(this);
+    }
+
+    private boolean transferReceive(double amount, Account fromAccount){
+        this.balance += amount;
+        return update(this);
+    }
+
+
 }
