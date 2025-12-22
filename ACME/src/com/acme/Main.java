@@ -4,5 +4,7 @@ package com.acme;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
+        CLI cli = new CLI();
+        cli.showMainMenu();
     }
 }

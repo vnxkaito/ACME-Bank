@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class UserService implements UserServiceInterface {
     ObjectMapper mapper = new ObjectMapper();
@@ -27,9 +28,13 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public User read(String userId) throws IOException {
-        User user;
+        List<User> userList = new ArrayList<>();
+        User user = new User();
         try{
-            user = readAll().stream().filter(u -> u.getUserId().equalsIgnoreCase(userId)).toList().get(0);
+            userList = readAll().stream().filter(u -> u.getUserId().equalsIgnoreCase(userId)).toList();
+            if(!userList.isEmpty()){
+                user = userList.get(0);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -45,7 +50,6 @@ public class UserService implements UserServiceInterface {
         if(files != null){
             for(File file: files){
                 String url = "data/users/"+file.getName();
-                System.out.println(url);
                 User user = mapper.readValue(new File(url), User.class);
                 users.add(user);
             }

@@ -6,11 +6,18 @@ import com.acme.services.account.AccountService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Session {
-    User loggedUser;
+    User loggedUser = new User();
     int loginAttempts = 0;
-    LocalDateTime cooldown;
+    Optional<LocalDateTime> cooldown = Optional.empty();
+
+    public static void main(String[] args) throws IOException {
+        Session session = new Session();
+        session.login("testI", "testPassword");
+        System.out.println(session.loggedUser.getUserId());
+    }
 
     public boolean login(String userId, String password) throws IOException {
         if(checkCoolDown()){
@@ -19,13 +26,20 @@ public class Session {
         User user = new User();
         PasswordEncryption enc = new PasswordEncryption();
         user = user.read(userId);
-        if(user.getPassword().equalsIgnoreCase(enc.encryptPassword(password))){
+        if(user.getUserId() == null){
+            return false;
+        }
+        if(enc.decryptPassword(user.getPassword()).equalsIgnoreCase(password)){
             loggedUser = user;
             return true;
         }else{
             incrementAttempts();
             return false;
         }
+    }
+
+    public void logout(){
+        loggedUser = new User();
     }
 
     private void incrementAttempts(){
@@ -35,7 +49,11 @@ public class Session {
         }
     }
     private boolean checkCoolDown(){
-        if(!(cooldown.isBefore(LocalDateTime.now().minusMinutes(1)))){
+        LocalDateTime cooldownTime;
+        if(cooldown.isEmpty()){
+            return false;
+        }
+        if(!(cooldown.get().isBefore(LocalDateTime.now().minusMinutes(1)))){
             System.out.println("Too many attempts, please wait");
             return true;
         }else{
@@ -43,6 +61,7 @@ public class Session {
         }
     }
     private void applyCooldown(){
-        this.cooldown = LocalDateTime.now();
+        LocalDateTime cooldownTime = LocalDateTime.now();
+        this.cooldown = Optional.of(cooldownTime);
     }
 }
