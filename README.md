@@ -28,6 +28,7 @@
 + amount
 + status
 
-![ERD](https://i.postimg.cc/zXgmWmTK/image.png)
+## ERD
+![ERD](https://gcdnb.pbrd.co/images/RKdrPFs6kxVa.png?o=1)
 
 ### Available commands
