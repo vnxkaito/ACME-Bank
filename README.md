@@ -10,15 +10,18 @@
 + userId
 + password
 + role
++ name
 
 ### Account
 + accountId
++ userId
 + balance
 + accountType
 + cardType
 + isLocked
 
 ### Transaction
++ transactionId
 + timestamp
 + from
 + to
@@ -26,11 +29,12 @@
 + type
 
 ### Overdraft
++ overdraftId
 + account
 + amount
-+ status
++ isPaid
 
 ## ERD
-![ERD](https://gcdnb.pbrd.co/images/RKdrPFs6kxVa.png?o=1)
+![ERD](https://i.imgur.com/CviUeHl.png)
 
 ### Available commands
