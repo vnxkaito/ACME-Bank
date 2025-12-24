@@ -142,43 +142,45 @@ public class Transaction extends TransactionService {
         return new ArrayList<>(transactions);
     }
 
-    public ArrayList<Transaction> getCustomPeriodTransactions(String accountId, int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) throws IOException {
+
+    public List<Transaction> getCustomPeriodTransactions(String accountId, LocalDateTime startTimestamp, LocalDateTime endTimestamp) throws IOException {
+        if(endTimestamp.isBefore(startTimestamp)){
+            System.out.println("End time cannot be before start time");
+            return null;
+        }
+
         Transaction transaction = new Transaction();
-        List<Transaction> transactions = new ArrayList<>();
-        LocalDateTime startDate = LocalDateTime.of(startYear, startMonth, startDay, 0, 0, 0);
-        LocalDateTime endDate = LocalDateTime.of(endYear, endMonth, endDay, 0, 0, 0);
-        transactions = transaction.readAll().stream().toList();
-        transactions = transactions.stream().filter(t->t.getTimestamp().isPresent())
-                .filter(t->t.getTimestamp().get().isAfter(startDate) || t.getTimestamp().get().isEqual(startDate) )
-                .filter(t->t.getTimestamp().get().isBefore(endDate))
-                .filter(t->(t.getToAccountId().equalsIgnoreCase(accountId))||(t.getFromAccountId().equalsIgnoreCase(accountId)))
+        ArrayList<Transaction> transactions = new ArrayList<>();
+
+        return transaction.readAll().stream().filter(t -> t.getTimestamp().isPresent())
+                .filter(t->t.getTimestamp().get().isAfter(startTimestamp))
+                .filter(t->( (t.getTimestamp().get().isBefore(endTimestamp)) || (t.getTimestamp().get().isEqual(endTimestamp))) )
+                .filter(t->((t.getToAccountId().equalsIgnoreCase(accountId))||(t.getFromAccountId().equalsIgnoreCase(accountId))))
                 .toList();
-        return new ArrayList<>(transactions);
     }
 
-    public ArrayList<Transaction> getTodayTransactions(String accountId) throws IOException {
+    public List<Transaction> getTodayTransactions(String accountId) throws IOException {
+        int thisYear = LocalDateTime.now().getYear();
+        int thisMonth = LocalDateTime.now().getMonthValue();
+        int thisDay = LocalDateTime.now().getDayOfMonth();
         return getCustomPeriodTransactions(
                 accountId,
-          LocalDateTime.now().getYear(),
-          LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getDayOfMonth(),
-                LocalDateTime.now().getYear(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getDayOfMonth()
+                LocalDateTime.of(thisYear, thisMonth, thisDay, 0, 0 ,0),
+                LocalDateTime.now()
         );
     }
 
-    public ArrayList<Transaction> getYesterdayTransactions(String accountId) throws IOException {
+    public List<Transaction> getYesterdayTransactions(String accountId) throws IOException {
+        int thisYear = LocalDateTime.now().getYear();
+        int thisMonth = LocalDateTime.now().getMonthValue();
+        int thisDay = LocalDateTime.now().getDayOfMonth();
         return getCustomPeriodTransactions(
                 accountId,
-                LocalDateTime.now().getYear(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getDayOfMonth() - 1,
-                LocalDateTime.now().getYear(),
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getDayOfMonth() - 1
+                LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0),
+                LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0)
         );
     }
+
 
     public void printPastDaysStatement(String accountId, int days) throws IOException {
         Transaction transaction = new Transaction();

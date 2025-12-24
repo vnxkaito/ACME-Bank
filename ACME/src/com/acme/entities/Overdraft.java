@@ -79,6 +79,4 @@ public class Overdraft extends OverdraftService{
         account.setLocked(true);
     }
 
-
-
 }
