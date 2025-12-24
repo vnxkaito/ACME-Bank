@@ -1,0 +1,26 @@
+Actors:
+- User
+- system
+- Customer
+- Banker
+- Admin
+
+User Stories:
+US1 - As a user, I want to login using my username and password, so I can access my account/s.
+US2 - As a system, I want to recognize the user role, so I can control access to commands.
+US3 - As an admin, I want to create a user, so I can enable users to use the system.
+US4 - As a banker, I want to create an account, so I can give it to a user.
+US5 - As a banker, I want to assign a user id to an account, so the user can access it.
+US6 - As a customer, I want to change the password of my account, so I can make it more secure.
+US7 - As a customer, I want to deposit money into my account, so I can increase my balance.
+US8 - As a customer, I want to withdraw money from my account, so I can use the money.
+US9 - As a customer, I want to transfer money from my account, so I can move the money.
+US10 - As a system, I want to charge an overdraft protection fee of $35 when the user is overdrafting, so I can discourage the user from overdrafting.
+US11 - As a system, I want to prevent withdrawal more than $100 when the account balance is negative, to reduce risk of big withdrawals from account with negative balance.
+US12 - As a system, I want to deactivate the account after 2 overdrafts, so I can prevent the customer from repetitively overdrafting.
+US13 - As a system, I want to reactivate the account when the overdraft fees are paid, so I the user can use their account again.
+US14 - As a system, I want to log all transactions (withdrawals, deposits, transfers), so I can enable the users to analyze this data.
+US15 - As a system, I want to encrypt the passwords when user creates a new account to change the password of an existing account, so I can improve security.
+US16 - As a customer, I want to see the statement of my account showing the starting balance, ending balance, and all the transaction for a set period of time.
+US17 - As a banker, when I create the account I want to specify the card type for the account, so I can associate the account with a card type.
+US18 - As a system, I want to give a cooldown period of 1 minute after 3 consecutive failed login attempts, so I can prevent brute force attacks.
