@@ -3,6 +3,7 @@ package com.acme.entities;
 import com.acme.services.account.AccountService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,6 +193,71 @@ public class Account extends AccountService {
         }
     }
 
+    private double checkTodayWithdrawUsage(String accountId) throws IOException {
+        Transaction transaction = new Transaction();
+        double amount = 0;
+        String type = "withdraw";
+        List<Transaction> transactions =
+                transaction.getCustomPeriodTransactionsForType(accountId, transaction.getTodayStartTimeStamp(), LocalDateTime.now(), type);
+
+        amount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+
+        return amount;
+
+    }
+
+    private double checkTodayDepositUsage(String accountId, boolean toOwn) throws IOException {
+        Transaction transaction = new Transaction();
+        double amount = 0;
+        String type = "deposit";
+        List<Transaction> transactions =
+                transaction.getCustomPeriodTransactionsForType(accountId, transaction.getTodayStartTimeStamp(), LocalDateTime.now(), type);
+        if(toOwn){
+            transactions = transactions.stream().filter(t -> {
+                try {
+                    return checkSameOwner(accountId, t.getToAccountId());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+        }
+        amount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+
+        return amount;
+    }
+
+    private double checkTodayTransferUsage(String accountId, boolean toOwn) throws IOException {
+        Transaction transaction = new Transaction();
+        double amount = 0;
+        String type = "transfer";
+        List<Transaction> transactions =
+                transaction.getCustomPeriodTransactionsForType(accountId, transaction.getTodayStartTimeStamp(), LocalDateTime.now(), type);
+
+        if(toOwn){
+            transactions = transactions.stream().filter(t -> {
+                try {
+                    return ( checkSameOwner(t.getFromAccountId(), t.getToAccountId())
+                            && ( (checkSameOwner(t.getFromAccountId(), accountId) )
+                                    || (checkSameOwner(t.getToAccountId(), accountId))
+                    ));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+        }
+
+        amount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+
+        return amount;
+    }
+
+
+
+    private static boolean checkSameOwner(String accountIdOne, String accountIdTwo) throws IOException {
+        Account accountOne = new Account().read(accountIdOne);
+        Account accountTwo = new Account().read(accountIdTwo);
+        return accountOne.getUserId().equalsIgnoreCase(accountTwo.getUserId());
+    }
 
 
     @Override

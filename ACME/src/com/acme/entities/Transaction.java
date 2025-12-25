@@ -159,13 +159,18 @@ public class Transaction extends TransactionService {
                 .toList();
     }
 
+    public List<Transaction> getCustomPeriodTransactionsForType(String accountId, LocalDateTime startTimestamp, LocalDateTime endTimestamp, String type) throws IOException {
+        return getCustomPeriodTransactions(accountId, startTimestamp, endTimestamp).stream()
+                .filter(transaction -> transaction.getType().equalsIgnoreCase(type))
+                .toList();
+    }
+
+
     public List<Transaction> getTodayTransactions(String accountId) throws IOException {
-        int thisYear = LocalDateTime.now().getYear();
-        int thisMonth = LocalDateTime.now().getMonthValue();
-        int thisDay = LocalDateTime.now().getDayOfMonth();
+
         return getCustomPeriodTransactions(
                 accountId,
-                LocalDateTime.of(thisYear, thisMonth, thisDay, 0, 0 ,0),
+                getTodayStartTimeStamp(),
                 LocalDateTime.now()
         );
     }
@@ -179,6 +184,13 @@ public class Transaction extends TransactionService {
                 LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0),
                 LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0)
         );
+    }
+
+    public LocalDateTime getTodayStartTimeStamp(){
+        int thisYear = LocalDateTime.now().getYear();
+        int thisMonth = LocalDateTime.now().getMonthValue();
+        int thisDay = LocalDateTime.now().getDayOfMonth();
+        return LocalDateTime.of(thisYear, thisMonth, thisDay, 0, 0 ,0);
     }
 
 
@@ -208,9 +220,5 @@ public class Transaction extends TransactionService {
         getYesterdayTransactions(accountId).forEach(System.out::println);
     }
 
-    public void printCustomPeriodStatement(String accountId, int[] period) throws IOException {
-        getCustomPeriodTransactions(accountId, period[0], period[1], period[2], period[3], period[4], period[5])
-                .forEach(System.out::println);
-    }
 }
 
