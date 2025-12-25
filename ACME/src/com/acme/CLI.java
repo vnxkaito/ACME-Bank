@@ -5,6 +5,7 @@ import com.acme.entities.Transaction;
 import com.acme.entities.User;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -154,7 +155,7 @@ public class CLI {
                 changePassword();
                 break;
             case 6:
-                displayAccountStatement();
+                displayAccountStatement(chooseAccount());
                 break;
             case 9:
                 logout();
@@ -241,37 +242,42 @@ public class CLI {
 
     }
 
-    public void displayAccountStatement() throws IOException {
+    public void displayAccountStatement(String accountId) throws IOException {
         Transaction transaction = new Transaction();
-        String accountId = chooseAccount();
+
         System.out.println("Would you like to view the statement for:");
         System.out.println("1) Today");
         System.out.println("2) Yesterday");
-        System.out.println("3) Last 24 hours");
+        System.out.println("3) Last week");
         System.out.println("4) Last 7 days");
-        System.out.println("5) Last 30 days");
-        System.out.println("6) custom period");
+        System.out.println("5) Last Month");
+        System.out.println("6) Last 30 days");
+        System.out.println("7) custom period");
         int input = scn.nextInt();
 
         switch (input){
             case 1:
-                transaction.printTodayTransactions(accountId);
+                transaction.getTodayTransactions(accountId).forEach(System.out::println);
                 break;
             case 2:
-                transaction.printYesterdayTransactions(accountId);
+                transaction.getYesterdayTransactions(accountId).forEach(System.out::println);
                 break;
             case 3:
-                transaction.printPastDaysStatement(accountId,1);
+                transaction.getLastWeekTransactions(accountId).forEach(System.out::println);
                 break;
             case 4:
-                transaction.printPastDaysStatement(accountId,7);
+                transaction.getLast7DaysTransactions(accountId).forEach(System.out::println);
                 break;
             case 5:
-                transaction.printPastDaysStatement(accountId,30);
+                transaction.getLastMonthTransactions(accountId).forEach(System.out::println);
                 break;
             case 6:
+                transaction.getLast30DaysTransactions(accountId).forEach(System.out::println);
+            case 7:
                 int[] period = getCustomPeriod();
-                transaction.printCustomPeriodStatement(accountId, period);
+                LocalDateTime startDate = LocalDateTime.of(period[0], period[1], period[2], 0, 0, 0);
+                LocalDateTime endDate = LocalDateTime.of(period[3], period[4], period[5], 0, 0, 0);
+                transaction.getCustomPeriodTransactions(accountId, startDate, endDate).forEach(System.out::println);
                 break;
         }
         showMainMenu();
