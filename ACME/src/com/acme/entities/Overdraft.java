@@ -2,6 +2,7 @@ package com.acme.entities;
 import com.acme.services.overdraft.OverdraftService;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Overdraft extends OverdraftService{
     private String overdraftId;
@@ -53,9 +54,31 @@ public class Overdraft extends OverdraftService{
         return "ov" + System.currentTimeMillis();
     }
 
-    public static int getOverdraftCountForAccount(String accountId) throws IOException {
-        Overdraft overdraft = new Overdraft();
-        return overdraft.readAll().stream().filter(ov -> ov.getAccountId().equalsIgnoreCase(accountId)).toList().size();
+    public static int getUnpaidOverdraftCount(String accountId) throws IOException {
+        return getUnpaidOverdraftsOfAccount(accountId).stream()
+                .toList().size();
+    }
+
+    public static double getUnpaidOverdraftsSum(String accountId) throws IOException {
+        return getUnpaidOverdraftsOfAccount(accountId).stream()
+                .mapToDouble(Overdraft::getAmount)
+                .sum();
+    }
+
+    public static List<Overdraft> getUnpaidOverdraftsOfAccount(String accountId) throws IOException {
+        return getOverdraftsOfAccount(accountId).stream().filter(ov-> !ov.isPaid())
+                .toList();
+    }
+
+    public static List<Overdraft> getOverdraftsOfAccount(String accountId) throws IOException {
+        return new Overdraft().readAll().stream()
+                .filter(ov -> ov.getAccountId().equalsIgnoreCase(accountId))
+                .toList();
+    }
+
+    public void payOverdraft(){
+        this.isPaid = true;
+        this.update(this);
     }
 
     public void chargeOverdraft(String accountId, double amount) throws IOException {
@@ -67,7 +90,7 @@ public class Overdraft extends OverdraftService{
         overdraft.setPaid(false);
         overdraft.create(overdraft);
         System.out.println("Overdraft is charged");
-        if(getOverdraftCountForAccount(accountId) >= 2){
+        if(getUnpaidOverdraftCount(accountId) >= 2){
             System.out.println("2 overdrafts, account is getting locked/deactivated");
             lockAccount(accountId);
         }

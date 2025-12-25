@@ -1,6 +1,7 @@
 package com.acme;
 
 import com.acme.entities.Account;
+import com.acme.entities.Overdraft;
 import com.acme.entities.Transaction;
 import com.acme.entities.User;
 
@@ -135,6 +136,8 @@ public class CLI {
         System.out.println("4) transfer");
         System.out.println("5) change password");
         System.out.println("6) display account statement");
+        System.out.println("7) view overdrafts");
+        System.out.println("8) pay overdrafts");
         System.out.println("9) logout");
         System.out.println("0) exit");
         int input = scn.nextInt();
@@ -157,6 +160,10 @@ public class CLI {
             case 6:
                 displayAccountStatement(chooseAccount());
                 break;
+            case 7:
+                viewUnpaidOverdrafts(chooseAccount());
+            case 8:
+                payOverdraftDialog(chooseAccount());
             case 9:
                 logout();
                 break;
@@ -397,6 +404,32 @@ public class CLI {
             }
         }while(!userExists);
         return userId;
+    }
+
+    public void viewUnpaidOverdrafts(String accountId) throws IOException {
+        List<Overdraft> overdrafts = Overdraft.getUnpaidOverdraftsOfAccount(accountId);
+        if(overdrafts.isEmpty()){
+            System.out.println("This account doesn't any unpaid overdrafts");
+        }else{
+            for(int i = 0; i < overdrafts.size(); i++){
+                System.out.println((i+1)+") " + overdrafts.get(i));
+            }
+
+        }
+    }
+
+    public void payOverdraftDialog(String accountId) throws IOException {
+        List<Overdraft> overdrafts = Overdraft.getUnpaidOverdraftsOfAccount(accountId);
+        if(overdrafts.isEmpty()){
+            System.out.println("This account doesn't any unpaid overdrafts");
+        }else{
+            for(int i = 0; i < overdrafts.size(); i++){
+                System.out.println((i+1)+") " + overdrafts.get(i));
+            }
+            int input = scn.nextInt();
+            overdrafts.get(input-1).payOverdraft();
+        }
+
     }
 
 
