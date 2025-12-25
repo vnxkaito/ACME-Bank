@@ -15,7 +15,7 @@ public class Account extends AccountService {
     private String cardType;
     private boolean isLocked;
 
-    public Account(){
+    public Account() {
 
     }
 
@@ -132,26 +132,31 @@ public class Account extends AccountService {
     }
 
     public boolean withdraw(double amount) throws IOException {
-        if(!checkWithdrawLimit()){
+        if (!checkWithdrawLimit(this.accountId)) {
+            System.out.println("Limit reached");
             return false;
         }
         Overdraft overdraft = new Overdraft();
-        if(this.balance > -100 && !this.isLocked){
-            if(this.balance < 0) {
+        if (this.balance > -100 && !this.isLocked) {
+            if (this.balance < 0) {
                 overdraft.chargeOverdraft(this.accountId, 35);
             }
-                this.balance -= amount;
-                Transaction transaction = new Transaction();
-                transaction.logWithdraw(this, amount);
-                this.update(this);
-            }else {
+            this.balance -= amount;
+            Transaction transaction = new Transaction();
+            transaction.logWithdraw(this, amount);
+            this.update(this);
+        } else {
             return false;
         }
 
         return true;
     }
 
-    public boolean deposit(double amount){
+    public boolean deposit(double amount) throws IOException {
+        if (!checkDepositLimit(this.accountId)) {
+            System.out.println("Limit reached");
+            return false;
+        }
         this.balance += amount;
         Transaction transaction = new Transaction();
         transaction.logDeposit(this, amount);
@@ -159,38 +164,44 @@ public class Account extends AccountService {
         return true;
     }
 
-    public boolean transfer(double amount, Account toAccount){
+    public boolean transfer(double amount, Account toAccount) throws IOException {
+        if (!checkTransferLimit(this.accountId)) {
+            System.out.println("Limit reached");
+            return false;
+        }
         Transaction transaction = new Transaction();
         transaction.logTransfer(this, toAccount, amount);
         return this.transferSend(amount, toAccount) && toAccount.transferReceive(amount, this);
     }
 
-    private boolean transferSend(double amount, Account toAccount){
+    private boolean transferSend(double amount, Account toAccount) {
         this.balance -= amount;
         return update(this);
     }
 
-    private boolean transferReceive(double amount, Account fromAccount){
+    private boolean transferReceive(double amount, Account fromAccount) {
         this.balance += amount;
         return update(this);
     }
 
-    private boolean checkWithdrawLimit() throws IOException {
-        Transaction transaction = new Transaction();
-        double usage = transaction.depositAmountToday(accountId);
-        double limit = 0;
-        if(this.cardType.equalsIgnoreCase("mastercard titanium")){
-            limit = 10000;
-        } else if (this.cardType.equalsIgnoreCase("mastercard Platinum")) {
-            limit = 20000;
-        } else{ // mastercard
-            limit = 5000;
-        }
-        if(usage>limit){
-            return false;
-        }else{
-            return true;
-        }
+    private boolean checkWithdrawLimit(String fromAccountId) throws IOException {
+        double limit = getCardTypeLimit("withdraw", false);
+        double usage = checkTodayWithdrawUsage(fromAccountId);
+        return usage < limit;
+    }
+
+    private boolean checkDepositLimit(String toAccountId) throws IOException {
+        boolean toOwn = checkSameOwner(this.accountId, toAccountId);
+        double limit = getCardTypeLimit("deposit", toOwn);
+        double usage = checkTodayDepositUsage(accountId, toOwn);
+        return usage < limit;
+    }
+
+    private boolean checkTransferLimit(String toAccountId) throws IOException {
+        boolean toOwn = checkSameOwner(this.accountId, toAccountId);
+        double limit = getCardTypeLimit("transfer", toOwn);
+        double usage = checkTodayTransferUsage(accountId, toOwn);
+        return usage < limit;
     }
 
     private double checkTodayWithdrawUsage(String accountId) throws IOException {
@@ -212,7 +223,7 @@ public class Account extends AccountService {
         String type = "deposit";
         List<Transaction> transactions =
                 transaction.getCustomPeriodTransactionsForType(accountId, transaction.getTodayStartTimeStamp(), LocalDateTime.now(), type);
-        if(toOwn){
+        if (toOwn) {
             transactions = transactions.stream().filter(t -> {
                 try {
                     return checkSameOwner(accountId, t.getToAccountId());
@@ -233,12 +244,11 @@ public class Account extends AccountService {
         List<Transaction> transactions =
                 transaction.getCustomPeriodTransactionsForType(accountId, transaction.getTodayStartTimeStamp(), LocalDateTime.now(), type);
 
-        if(toOwn){
+        if (toOwn) {
             transactions = transactions.stream().filter(t -> {
                 try {
-                    return ( checkSameOwner(t.getFromAccountId(), t.getToAccountId())
-                            && ( (checkSameOwner(t.getFromAccountId(), accountId) )
-                                    || (checkSameOwner(t.getToAccountId(), accountId))
+                    return (checkSameOwner(t.getFromAccountId(), t.getToAccountId())
+                            && (this.accountId.equalsIgnoreCase(t.getFromAccountId())
                     ));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -249,6 +259,61 @@ public class Account extends AccountService {
         amount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
 
         return amount;
+    }
+
+    private double getCardTypeLimit(String type, boolean isOwn) {
+        if (type.equalsIgnoreCase("withdraw")) {
+            if (this.cardType.equalsIgnoreCase("mastercard")) {
+                return 5000;
+            } else if (this.cardType.equalsIgnoreCase("mastercard titanium")) {
+                return 10000;
+            } else if (this.cardType.equalsIgnoreCase("mastercard platinum")) {
+                return 20000;
+            }
+        } else if (type.equalsIgnoreCase("deposit")) {
+            if (isOwn) {
+                // Deposit to own
+                if (this.cardType.equalsIgnoreCase("mastercard")) {
+                    return 200000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard titanium")) {
+                    return 200000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard platinum")) {
+                    return 200000;
+                }
+            } else {
+                // Deposit
+                if (this.cardType.equalsIgnoreCase("mastercard")) {
+                    return 100000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard titanium")) {
+                    return 100000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard platinum")) {
+                    return 100000;
+                }
+            }
+
+        } else if (type.equalsIgnoreCase("transfer")) {
+            if (isOwn) {
+                // Transfer to own
+                if (this.cardType.equalsIgnoreCase("mastercard")) {
+                    return 20000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard titanium")) {
+                    return 40000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard platinum")) {
+                    return 80000;
+                }
+            } else {
+                // Deposit
+                if (this.cardType.equalsIgnoreCase("mastercard")) {
+                    return 10000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard titanium")) {
+                    return 20000;
+                } else if (this.cardType.equalsIgnoreCase("mastercard platinum")) {
+                    return 40000;
+                }
+            }
+        }
+        return 0;
+
     }
 
 
