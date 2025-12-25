@@ -3,6 +3,7 @@ package com.acme.entities;
 import com.acme.services.transaction.TransactionService;
 
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +167,7 @@ public class Transaction extends TransactionService {
     }
 
 
+    // today
     public List<Transaction> getTodayTransactions(String accountId) throws IOException {
 
         return getCustomPeriodTransactions(
@@ -175,15 +177,56 @@ public class Transaction extends TransactionService {
         );
     }
 
+    // yesterday
     public List<Transaction> getYesterdayTransactions(String accountId) throws IOException {
-        int thisYear = LocalDateTime.now().getYear();
-        int thisMonth = LocalDateTime.now().getMonthValue();
-        int thisDay = LocalDateTime.now().getDayOfMonth();
         return getCustomPeriodTransactions(
                 accountId,
-                LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0),
-                LocalDateTime.of(thisYear, thisMonth, thisDay-1, 0, 0 ,0)
+                getTodayStartTimeStamp().minusDays(1),
+                getTodayStartTimeStamp().minusSeconds(1)
         );
+    }
+
+    // last week
+    public List<Transaction> getLastWeekTransactions(String accountId) throws IOException {
+        return getCustomPeriodTransactions(
+                accountId,
+                getLastMonthStartTimeStamp(),
+                getLastWeekEndTimeStamp()
+        );
+    }
+
+    // last 7 days
+    public List<Transaction> getLast7DaysTransactions(String accountId) throws IOException {
+        return getCustomPeriodTransactions(
+                accountId,
+                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7)
+                );
+    }
+
+    // last month
+    public List<Transaction> getLastMonthTransactions(String accountId) throws IOException {
+        return getCustomPeriodTransactions(
+                accountId,
+                getLastMonthStartTimeStamp(),
+                getLastMonthEndTimeStamp()
+                );
+    }
+
+    // last 30 days
+    public List<Transaction> getLast30DaysTransactions(String accountId) throws IOException {
+        return getCustomPeriodTransactions(
+                accountId,
+                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(30)
+                );
+    }
+
+
+
+    public void printPastDaysStatement(String accountId, int days) throws IOException {
+        Transaction transaction = new Transaction();
+        transaction.getPastDaysTransactions(accountId, days).forEach(System.out::println);
     }
 
     public LocalDateTime getTodayStartTimeStamp(){
@@ -193,10 +236,19 @@ public class Transaction extends TransactionService {
         return LocalDateTime.of(thisYear, thisMonth, thisDay, 0, 0 ,0);
     }
 
+    public LocalDateTime getLastWeekStartTimeStamp(){
+        return LocalDateTime.now().minusWeeks(1).with(DayOfWeek.SUNDAY).withHour(0).withMinute(0).withSecond(0);
+    }
 
-    public void printPastDaysStatement(String accountId, int days) throws IOException {
-        Transaction transaction = new Transaction();
-        transaction.getPastDaysTransactions(accountId, days).forEach(System.out::println);
+    public LocalDateTime getLastWeekEndTimeStamp(){
+        return LocalDateTime.now().with(DayOfWeek.SUNDAY).withHour(0).withMinute(0).withSecond(0).minusSeconds(1);
+    }
+
+    public LocalDateTime getLastMonthStartTimeStamp(){
+        return LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+    }
+    public LocalDateTime getLastMonthEndTimeStamp(){
+        return LocalDateTime.now().minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusSeconds(1);
     }
 
     @Override
