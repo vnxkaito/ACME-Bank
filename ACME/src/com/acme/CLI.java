@@ -105,6 +105,7 @@ public class CLI {
                 break;
 
         }
+        showMainMenu();
     }
     public void showBankerMenu() throws IOException {
         pleaseChooseText();
@@ -119,6 +120,9 @@ public class CLI {
             case 1:
                 createAccount();
                 break;
+            case 3:
+                System.out.println("please enter an account id");
+                displayAccountBalance(scn.next());
             case 9:
                 logout();
                 break;
@@ -127,6 +131,7 @@ public class CLI {
                 break;
 
         }
+        showMainMenu();
     }
     public void showCustomerMenu() throws IOException {
         pleaseChooseText();
@@ -172,6 +177,7 @@ public class CLI {
                 break;
 
         }
+        showMainMenu();
     }
 
     public void logout() throws IOException {
@@ -244,7 +250,13 @@ public class CLI {
 
     }
 
-    public void displayAccountBalance() throws IOException {
+    public void displayAccountBalance(String accountId) throws IOException {
+        if(new Account().read(accountId).doesAccountExist(accountId)){
+            System.out.println("The balance for account " + accountId +
+                    " is " + new Account().read(accountId).getBalance());
+        }else {
+            System.out.println("This account doesn't exist");
+        }
         showMainMenu();
 
     }
