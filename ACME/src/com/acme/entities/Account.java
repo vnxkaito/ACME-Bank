@@ -271,7 +271,7 @@ public class Account extends AccountService {
         return amount;
     }
 
-    private double getCardTypeLimit(String type, boolean isOwn) {
+    public double getCardTypeLimit(String type, boolean isOwn) {
         if (type.equalsIgnoreCase("withdraw")) {
             if (this.cardType.equalsIgnoreCase("mastercard")) {
                 return 5000;

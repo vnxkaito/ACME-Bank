@@ -11,10 +11,25 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AccountTest {
     Account testAccount;
     Account testAccount2;
+
+    Account testAccount1_1;
+    Account testAccount1_2;
+    Account testAccount1_3;
+    Account testAccount2_1;
+    Account testAccount2_2;
+    Account testAccount2_3;
     @BeforeEach
     public void setUp() throws IOException {
         testAccount = new Account().read("testAccount");
         testAccount2 = new Account().read("testAccount2");
+
+        testAccount1_1 = new Account().read("testAccount1_1"); // MASTERCARD
+        testAccount1_1 = new Account().read("testAccount1_2"); // MASTERCARD TITANIUM
+        testAccount1_1 = new Account().read("testAccount1_3"); // MASTERCARD PLATINUM
+
+        testAccount1_1 = new Account().read("testAccount2_1"); // MASTERCARD
+        testAccount1_1 = new Account().read("testAccount2_2"); // MASTERCARD TITANIUM
+        testAccount1_1 = new Account().read("testAccount2_3"); // MASTERCARD PLATINUM
         setTestAccountBalance(100);
     }
 
@@ -73,6 +88,155 @@ public class AccountTest {
     private void setTestAccount2Balance(double amount){
         this.testAccount2.setBalance(amount);
         this.testAccount2.update(this.testAccount2);
+    }
+
+    // ----- TESTING CARDS LIMITS ------ //
+
+    // ----- withdraw ------ //
+    @Test(expected = RuntimeException.class)
+    @DisplayName("withdrawal limit mastercard")
+    public final void WLM() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard", false);
+        boolean failWhenMoreThanLimit = !testAccount1_1.withdraw(limit + 1);
+        boolean successWhenLessThanLimit = testAccount1_1.withdraw(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("withdrawal limit mastercard titanium")
+    public final void WLMT() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard titanium", false);
+        boolean failWhenMoreThanLimit = !testAccount1_2.withdraw(limit + 1);
+        boolean successWhenLessThanLimit = testAccount1_2.withdraw(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("withdrawal limit mastercard platinum")
+    public final void WLMP() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard platinum", false);
+        boolean failWhenMoreThanLimit = !testAccount1_3.withdraw(limit + 1);
+        boolean successWhenLessThanLimit = testAccount1_3.withdraw(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    // ----- deposit ------ //
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit limit mastercard")
+    public final void DLM() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard", false);
+        boolean failWhenMoreThanLimit = !testAccount2_1.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_1.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit limit mastercard titanium")
+    public final void DLMT() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard titanium", false);
+        boolean failWhenMoreThanLimit = !testAccount2_2.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_2.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit limit mastercard platinum")
+    public final void DLMP() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard platinum", false);
+        boolean failWhenMoreThanLimit = !testAccount2_3.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_3.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    // ----- deposit to own ------ //
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit to own limit mastercard")
+    public final void DLMO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard", true);
+        boolean failWhenMoreThanLimit = !testAccount2_1.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_1.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit to own limit mastercard titanium")
+    public final void DLMTO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard titanium", true);
+        boolean failWhenMoreThanLimit = !testAccount2_2.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_2.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("deposit to own limit mastercard platinum")
+    public final void DLMPO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard platinum", true);
+        boolean failWhenMoreThanLimit = !testAccount2_3.deposit(limit + 1);
+        boolean successWhenLessThanLimit = testAccount2_3.deposit(limit - 1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    // ----- transfer ------ //
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer limit mastercard")
+    public final void TLM() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard", false);
+        boolean failWhenMoreThanLimit = !testAccount2_1.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_1.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer limit mastercard titanium")
+    public final void TLMT() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard titanium", false);
+        boolean failWhenMoreThanLimit = !testAccount2_2.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_2.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer limit mastercard platinum")
+    public final void TLMP() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard platinum", false);
+        boolean failWhenMoreThanLimit = !testAccount2_3.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_3.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+    }
+    // ----- transfer to own ------ //
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer to own limit mastercard")
+    public final void TLMO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard", true);
+        boolean failWhenMoreThanLimit = !testAccount2_1.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_1.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer to own limit mastercard titanium")
+    public final void TLMTO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard titanium", true);
+        boolean failWhenMoreThanLimit = !testAccount2_2.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_2.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DisplayName("transfer to own limit mastercard platinum")
+    public final void TLMPO() throws IOException {
+        double limit = testAccount.getCardTypeLimit("mastercard platinum", true);
+        boolean failWhenMoreThanLimit = !testAccount2_3.transfer(limit + 1, testAccount1_1);
+        boolean successWhenLessThanLimit = testAccount2_3.transfer(limit - 1, testAccount1_1);
+        assertTrue(failWhenMoreThanLimit && successWhenLessThanLimit);
+
     }
 
 }

@@ -1,1 +1,1 @@
-{"accountId":"testAccount","userId":"testId","balance":1000.0,"accountType":"CHECKING","cardType":"MASTERCARD","locked":false}
+{"accountId":"testAccount","userId":"testId1","balance":1000000.0,"accountType":"CHECKING","cardType":"MASTERCARD","locked":false}
