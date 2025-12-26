@@ -10,6 +10,12 @@
 + customer2, password2
 + customer3, password3
 + banker, password4
+note: you cannot create a user in the CLI but you can play around with the files.
+
+### Accounts
++ You can display your accounts will logged in
++ As a banker you can create an account and you can link it to a user
++ As a customer you can change your password
 
 ## Entities
 ### User
@@ -41,6 +47,7 @@
 + isPaid
 
 ## ERD
-![ERD](https://i.imgur.com/CviUeHl.png)
+![ERD](Documentation/ERD.png)
 
 ### Available commands
+Please follow the guidlines that appear in the screen while running the CLI
