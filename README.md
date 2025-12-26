@@ -5,6 +5,12 @@
 
 [User Stories](/Documentation/User%20Stories%20&%20Test%20Cases.txt)
 
+### Available users
++ customer1, password1
++ customer2, password2
++ customer3, password3
++ banker, password4
+
 ## Entities
 ### User
 + userId

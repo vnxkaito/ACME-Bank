@@ -327,7 +327,7 @@ public class Account extends AccountService {
     }
 
     public boolean doesAccountExist(String accountId) throws IOException {
-        return new Account().read(accountId).getAccountId() == null;
+        return new Account().read(accountId).getAccountId() != null;
     }
 
     private static boolean checkSameOwner(String accountIdOne, String accountIdTwo) throws IOException {

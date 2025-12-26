@@ -120,9 +120,27 @@ public class CLI {
             case 1:
                 createAccount();
                 break;
+            case 2:
+                System.out.println("please enter an account id");
+                String inputId = scn.next();
+                if(new Account().doesAccountExist(inputId)){
+                    Account account = new Account().read(inputId);
+                    System.out.println("please enter the id of the user you want to link to this account");
+                    account.setUserId(scn.next());
+                    System.out.println("user id linked successfully");
+                }
+                break;
             case 3:
                 System.out.println("please enter an account id");
                 displayAccountBalance(scn.next());
+                break;
+            case 4:
+                System.out.println("please enter an account id");
+                String inputAccountId = scn.next();
+                if(new Account().doesAccountExist(inputAccountId)){
+                    displayAccountStatement(inputAccountId);
+                }
+                break;
             case 9:
                 logout();
                 break;
