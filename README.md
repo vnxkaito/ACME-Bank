@@ -1,7 +1,7 @@
 # ACME Bank CLI
 
 ### A project to explore java different acpects
-[Project Planning](https://sharing.clickup.com/90182226880/l/h/4-90188894364-1/95c1aee49e954a7)
+[Project Planning](https://sharing.clickup.com/90182226880/l/h/6-901814482483-1/fba00e611f91a8a)
 
 [User Stories](/Documentation/User%20Stories%20&%20Test%20Cases.txt)
 
