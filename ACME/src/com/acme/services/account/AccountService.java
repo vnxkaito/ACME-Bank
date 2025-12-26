@@ -50,7 +50,7 @@ public class AccountService implements AccountServiceInterface{
 
     @Override
     public boolean delete(Account account) {
-        return false;
+        return new File("data/account/"+account.getAccountId()+".json").delete();
     }
 
     @Override

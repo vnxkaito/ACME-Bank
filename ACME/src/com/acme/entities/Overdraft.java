@@ -76,8 +76,12 @@ public class Overdraft extends OverdraftService{
                 .toList();
     }
 
-    public void payOverdraft(){
+    public void payOverdraft() throws IOException {
         this.isPaid = true;
+        Account account = new Account().read(this.accountId);
+        if(getUnpaidOverdraftCount(this.accountId) == 0 && account.getBalance() >= 0){
+            account.update(account);
+        }
         this.update(this);
     }
 
@@ -100,6 +104,16 @@ public class Overdraft extends OverdraftService{
         Account account = new Account();
         account = account.read(accountId);
         account.setLocked(true);
+        account.update(account);
     }
 
+    @Override
+    public String toString() {
+        return "Overdraft{" +
+                "overdraftId='" + overdraftId + '\'' +
+                ", accountId='" + accountId + '\'' +
+                ", amount=" + amount +
+                ", isPaid=" + isPaid +
+                '}';
+    }
 }

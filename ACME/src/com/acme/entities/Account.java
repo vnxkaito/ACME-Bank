@@ -132,40 +132,50 @@ public class Account extends AccountService {
     }
 
     public boolean withdraw(double amount) throws IOException {
-        if (!checkWithdrawLimit(this.accountId)) {
+        if (!checkWithdrawLimit(this.accountId, amount)) {
             System.out.println("Limit reached");
             return false;
         }
         Overdraft overdraft = new Overdraft();
-        if (this.balance > -100 && !this.isLocked) {
-            if (this.balance < 0) {
-                overdraft.chargeOverdraft(this.accountId, 35);
-            }
+        if ( (this.balance - amount) > -100 && !this.isLocked) {
             this.balance -= amount;
             Transaction transaction = new Transaction();
             transaction.logWithdraw(this, amount);
             this.update(this);
-        } else {
+            if (this.balance < 0) {
+                overdraft.chargeOverdraft(this.accountId, 35);
+            }
+        } else if(this.isLocked) {
+            System.out.println("Account is locked");
             return false;
-        }
+        } else if(this.balance <= -100) {
+            System.out.println("Insufficient balance");
+            return false;
+        }else{
+                return false;
+            }
+
 
         return true;
     }
 
     public boolean deposit(double amount) throws IOException {
-        if (!checkDepositLimit(this.accountId)) {
+        if (!checkDepositLimit(this.accountId, amount)) {
             System.out.println("Limit reached");
             return false;
         }
         this.balance += amount;
         Transaction transaction = new Transaction();
         transaction.logDeposit(this, amount);
+        if((Overdraft.getUnpaidOverdraftCount(this.accountId) == 0) && (this.balance >= 0)){
+            this.isLocked = false;
+        }
         this.update(this);
         return true;
     }
 
     public boolean transfer(double amount, Account toAccount) throws IOException {
-        if (!checkTransferLimit(this.accountId)) {
+        if (!checkTransferLimit(this.accountId, amount)) {
             System.out.println("Limit reached");
             return false;
         }
@@ -184,24 +194,24 @@ public class Account extends AccountService {
         return update(this);
     }
 
-    private boolean checkWithdrawLimit(String fromAccountId) throws IOException {
+    private boolean checkWithdrawLimit(String fromAccountId, double amount) throws IOException {
         double limit = getCardTypeLimit("withdraw", false);
         double usage = checkTodayWithdrawUsage(fromAccountId);
-        return usage < limit;
+        return (usage + amount) < limit;
     }
 
-    private boolean checkDepositLimit(String toAccountId) throws IOException {
+    private boolean checkDepositLimit(String toAccountId, double amount) throws IOException {
         boolean toOwn = checkSameOwner(this.accountId, toAccountId);
         double limit = getCardTypeLimit("deposit", toOwn);
         double usage = checkTodayDepositUsage(accountId, toOwn);
-        return usage < limit;
+        return (usage + amount) < limit;
     }
 
-    private boolean checkTransferLimit(String toAccountId) throws IOException {
+    private boolean checkTransferLimit(String toAccountId, double amount) throws IOException {
         boolean toOwn = checkSameOwner(this.accountId, toAccountId);
         double limit = getCardTypeLimit("transfer", toOwn);
         double usage = checkTodayTransferUsage(accountId, toOwn);
-        return usage < limit;
+        return (usage + amount) < limit;
     }
 
     private double checkTodayWithdrawUsage(String accountId) throws IOException {

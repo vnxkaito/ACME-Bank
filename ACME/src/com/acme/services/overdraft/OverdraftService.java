@@ -50,7 +50,7 @@ public class OverdraftService implements OverdraftServiceInterface {
 
     @Override
     public boolean delete(Overdraft overdraft) {
-        return false;
+        return new File("data/overdraft/"+overdraft.getOverdraftId()+".json").delete();
     }
 
     @Override

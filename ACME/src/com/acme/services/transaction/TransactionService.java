@@ -55,7 +55,7 @@ public class TransactionService implements TransactionServiceInterface{
 
     @Override
     public boolean delete(Transaction transaction) {
-        return false;
+        return new File("data/transaction/"+transaction.getTransactionId()+".json").delete();
     }
 
     @Override

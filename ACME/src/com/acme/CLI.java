@@ -167,8 +167,10 @@ public class CLI {
                 break;
             case 7:
                 viewUnpaidOverdrafts(chooseAccount());
+                break;
             case 8:
                 payOverdraftDialog(chooseAccount());
+                break;
             case 9:
                 logout();
                 break;
@@ -292,10 +294,11 @@ public class CLI {
                 break;
             case 6:
                 transaction.getLast30DaysTransactions(accountId).forEach(System.out::println);
+                break;
             case 7:
                 int[] period = getCustomPeriod();
                 LocalDateTime startDate = LocalDateTime.of(period[0], period[1], period[2], 0, 0, 0);
-                LocalDateTime endDate = LocalDateTime.of(period[3], period[4], period[5], 0, 0, 0);
+                LocalDateTime endDate = LocalDateTime.of(period[3], period[4], period[5], 0, 0, 0).plusDays(1);
                 transaction.getCustomPeriodTransactions(accountId, startDate, endDate).forEach(System.out::println);
                 break;
         }

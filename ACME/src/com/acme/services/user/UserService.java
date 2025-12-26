@@ -60,7 +60,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public boolean delete(User user) {
-        return false;
+         return new File("data/users/"+user.getFileName()+".json").delete();
     }
 
     @Override

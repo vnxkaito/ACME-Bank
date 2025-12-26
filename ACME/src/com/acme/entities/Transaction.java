@@ -1,6 +1,7 @@
 package com.acme.entities;
 
 import com.acme.services.transaction.TransactionService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -70,21 +71,7 @@ public class Transaction extends TransactionService {
     }
 
     public static String generateId(){
-        Transaction transaction = new Transaction();
-        boolean isValid = false;
-        int random;
-        do{
-            random = java.util.concurrent.ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
-            try{
-                transaction = transaction.read(("T"+random));
-                if(transaction.getTransactionId() == null){
-                    isValid = true;
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }while(!isValid);
-        return "T"+random;
+        return "T" + System.currentTimeMillis();
     }
 
     public void logWithdraw(Account fromAccount, double amount){
@@ -190,7 +177,7 @@ public class Transaction extends TransactionService {
     public List<Transaction> getLastWeekTransactions(String accountId) throws IOException {
         return getCustomPeriodTransactions(
                 accountId,
-                getLastMonthStartTimeStamp(),
+                getLastWeekStartTimeStamp(),
                 getLastWeekEndTimeStamp()
         );
     }
@@ -199,8 +186,8 @@ public class Transaction extends TransactionService {
     public List<Transaction> getLast7DaysTransactions(String accountId) throws IOException {
         return getCustomPeriodTransactions(
                 accountId,
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(7)
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now()
                 );
     }
 
@@ -217,8 +204,8 @@ public class Transaction extends TransactionService {
     public List<Transaction> getLast30DaysTransactions(String accountId) throws IOException {
         return getCustomPeriodTransactions(
                 accountId,
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(30)
+                LocalDateTime.now().minusDays(30),
+                LocalDateTime.now()
                 );
     }
 
@@ -229,6 +216,7 @@ public class Transaction extends TransactionService {
         transaction.getPastDaysTransactions(accountId, days).forEach(System.out::println);
     }
 
+    @JsonIgnore
     public LocalDateTime getTodayStartTimeStamp(){
         int thisYear = LocalDateTime.now().getYear();
         int thisMonth = LocalDateTime.now().getMonthValue();
@@ -236,19 +224,24 @@ public class Transaction extends TransactionService {
         return LocalDateTime.of(thisYear, thisMonth, thisDay, 0, 0 ,0);
     }
 
+    @JsonIgnore
     public LocalDateTime getLastWeekStartTimeStamp(){
         return LocalDateTime.now().minusWeeks(1).with(DayOfWeek.SUNDAY).withHour(0).withMinute(0).withSecond(0);
     }
 
+    @JsonIgnore
     public LocalDateTime getLastWeekEndTimeStamp(){
         return LocalDateTime.now().with(DayOfWeek.SUNDAY).withHour(0).withMinute(0).withSecond(0).minusSeconds(1);
     }
 
+    @JsonIgnore
     public LocalDateTime getLastMonthStartTimeStamp(){
-        return LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        return LocalDateTime.now().minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
     }
+
+    @JsonIgnore
     public LocalDateTime getLastMonthEndTimeStamp(){
-        return LocalDateTime.now().minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusSeconds(1);
+        return LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusSeconds(1);
     }
 
     @Override
